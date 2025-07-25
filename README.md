@@ -70,7 +70,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## Contact
 
-For questions, suggestions, or issues, please open an issue on the [GitHub repository](https://github.com/Furry-Monster/TechCore-Debugger) or contact the maintainer at [your-email@example.com].
+For questions, suggestions, or issues, please open an issue on the [GitHub repository](https://github.com/Furry-Monster/TechCore-Debugger) or contact the maintainer at [4urrym0nster@gmail.com].
 
 ---
 
