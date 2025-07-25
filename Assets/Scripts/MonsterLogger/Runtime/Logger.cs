@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace MonsterLogger.Runtime
 {
@@ -14,6 +15,19 @@ namespace MonsterLogger.Runtime
         internal static void Initialize(LogConfig config = null)
         {
             cfg = config ?? new LogConfig();
+
+
+            if (cfg.EnableFileLogger)
+            {
+                var go = new GameObject("FileLogger");
+                if (go == null)
+                    throw new Exception("Failed to create GameObject for FileLogger. Ensure you are running in a Unity environment.");
+                var comp = go.AddComponent<FileLogger>();
+                GameObject.DontDestroyOnLoad(go);
+                comp.Initialize(cfg.LogFilePath, cfg.LogFileName);
+            }
+
+
         }
 
         #region Log
