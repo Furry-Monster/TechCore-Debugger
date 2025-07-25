@@ -32,25 +32,28 @@ TechCore-Debugger is a lightweight and flexible debugger wrapper designed for Un
 
 ### Basic Example
 ```csharp
-using TechCore.Debugger;
+using MonsterLogger.Runtime;
+using UnityEngine;
+using Logger = MonsterLogger.Runtime.Logger;
 
-public class Example : MonoBehaviour
+public class LogTest : MonoBehaviour
 {
-    void Start()
+    private void Start()
     {
-        TechCoreDebugger.Log("Game started successfully!");
-        TechCoreDebugger.Warning("This is a warning message.");
-        TechCoreDebugger.Error("An error occurred!");
+        // Initialize the logger with default configuration
+        Logger.Initialize(new LogConfig { EnableLog = true });
+
+        // Example usage of the logger
+        Logger.Log("Game started successfully!", LogColor.Gray);
+        Logger.LogWarning("This is a warning message.", LogColor.Blue);
+        Logger.LogError("This is an error message.", LogColor.Green);
     }
 }
 ```
 
 ### Advanced Configuration
-You can customize the debugger's behavior by adjusting settings such as log levels, output destinations, and custom formatters. Example:
-```csharp
-TechCoreDebugger.SetLogLevel(LogLevel.Verbose);
-TechCoreDebugger.SetOutputDestination(OutputDestination.Console | OutputDestination.File);
-```
+You can customize the debugger's behavior in Unity Editor.
+Just Open Config Panel clicking Tools/MonsterLogger/Config!
 
 ## Contributing
 
