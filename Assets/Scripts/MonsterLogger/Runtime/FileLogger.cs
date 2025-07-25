@@ -1,7 +1,6 @@
+using MonsterLogger.Runtime;
 using System;
-using System.Collections;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using UnityEngine;
@@ -23,9 +22,11 @@ public class FileLogger : MonoBehaviour
 
     private bool _listening = false;
 
+    private LogLevel _logLevel = LogLevel.Info;
+
     private string _nowTime => DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
-    internal void Initialize(string logDirName, string logFileName)
+    internal void Initialize(string logDirName, string logFileName, LogLevel level)
     {
         string logFilePath = Path.Combine(logDirName, logFileName);
         _streamWriter = new StreamWriter(logFilePath);
@@ -52,18 +53,28 @@ public class FileLogger : MonoBehaviour
             {
                 if (data.type == LogType.Log)
                 {
+                    if (_logLevel > LogLevel.Info)
+                        continue;
+
                     _streamWriter.Write("Log >>> ");
                     _streamWriter.WriteLine(data.log);
                     _streamWriter.WriteLine(data.trace);
+
                 }
                 else if (data.type == LogType.Warning)
                 {
+                    if (_logLevel > LogLevel.Warning)
+                        continue;
+
                     _streamWriter.Write("Warning >>> ");
                     _streamWriter.WriteLine(data.log);
                     _streamWriter.WriteLine(data.trace);
                 }
                 else if (data.type == LogType.Error)
                 {
+                    if (_logLevel > LogLevel.Error)
+                        continue;
+
                     _streamWriter.Write("Error >>> ");
                     _streamWriter.WriteLine(data.log);
                     _streamWriter.WriteLine(data.trace);

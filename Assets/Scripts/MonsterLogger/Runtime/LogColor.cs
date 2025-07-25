@@ -1,10 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 namespace MonsterLogger.Runtime
 {
-    internal enum LogColor
+    public enum LogColor
     {
         Default,
         Red,

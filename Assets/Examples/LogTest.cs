@@ -1,6 +1,4 @@
 using MonsterLogger.Runtime;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Logger = MonsterLogger.Runtime.Logger;
 

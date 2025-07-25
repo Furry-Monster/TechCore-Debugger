@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
+using UnityEditor;
 using UnityEngine;
 
 namespace MonsterLogger.Runtime
@@ -14,9 +12,21 @@ namespace MonsterLogger.Runtime
 
         internal static void Initialize(LogConfig config = null)
         {
-            cfg = config ?? new LogConfig();
+            cfg = config ?? new LogConfig()
+            {
+                LogFilePath = Application.persistentDataPath + "/",
+                LogFileName = Application.productName + DateTime.Now.ToString("yyyy-MM-dd-HH-mm") + ".log",
+                EnableLog = EditorPrefs.GetBool("MonsterLogger_IsEnabled", true),
+                EnableFileLogger = EditorPrefs.GetBool("MonsterLogger_WriteToFile", false),
+                LogLevel = (LogLevel)EditorPrefs.GetInt("MonsterLogger_LogLevel", (int)LogLevel.Info),
+                Prefix = "[MonsterLogger]",
+                ShowTimeStamp = true,
+                ShowThreadId = true,
+                ShowColorName = true
+            };
 
 
+            // 启用文件日志记录
             if (cfg.EnableFileLogger)
             {
                 var go = new GameObject("FileLogger");
@@ -24,36 +34,34 @@ namespace MonsterLogger.Runtime
                     throw new Exception("Failed to create GameObject for FileLogger. Ensure you are running in a Unity environment.");
                 var comp = go.AddComponent<FileLogger>();
                 GameObject.DontDestroyOnLoad(go);
-                comp.Initialize(cfg.LogFilePath, cfg.LogFileName);
+                comp.Initialize(cfg.LogFilePath, cfg.LogFileName, cfg.LogLevel);
             }
-
-
         }
 
         #region Log
         internal static void Log(object obj)
         {
-            if (!cfg.EnableLog) return;
+            if (!cfg.EnableLog || cfg.LogLevel > LogLevel.Info) return;
             UnityEngine.Debug.Log(GenerateLog(obj?.ToString()));
         }
 
         internal static void Log(object obj, LogColor color)
         {
-            if (!cfg.EnableLog) return;
+            if (!cfg.EnableLog || cfg.LogLevel > LogLevel.Info) return;
             var content = GenerateLog(obj?.ToString(), color);
             UnityEngine.Debug.Log(LogColoring(content, color));
         }
 
         internal static void Log(object obj, params object[] args)
         {
-            if (!cfg.EnableLog) return;
+            if (!cfg.EnableLog || cfg.LogLevel > LogLevel.Info) return;
             var message = GenerateLog(ConcatMessage(obj, args));
             UnityEngine.Debug.Log(message);
         }
 
         internal static void Log(object obj, LogColor color, params object[] args)
         {
-            if (!cfg.EnableLog) return;
+            if (!cfg.EnableLog || cfg.LogLevel > LogLevel.Info) return;
             var message = GenerateLog(ConcatMessage(obj, args), color);
             UnityEngine.Debug.Log(LogColoring(message, color));
         }
@@ -62,27 +70,27 @@ namespace MonsterLogger.Runtime
         #region LogWarning
         internal static void LogWarning(object obj)
         {
-            if (!cfg.EnableLog) return;
+            if (!cfg.EnableLog || cfg.LogLevel > LogLevel.Warning) return;
             UnityEngine.Debug.LogWarning(GenerateLog(obj?.ToString()));
         }
 
         internal static void LogWarning(object obj, LogColor color)
         {
-            if (!cfg.EnableLog) return;
+            if (!cfg.EnableLog || cfg.LogLevel > LogLevel.Warning) return;
             var content = GenerateLog(obj?.ToString(), color);
             UnityEngine.Debug.LogWarning(LogColoring(content, color));
         }
 
         internal static void LogWarning(object obj, params object[] args)
         {
-            if (!cfg.EnableLog) return;
+            if (!cfg.EnableLog || cfg.LogLevel > LogLevel.Warning) return;
             var message = GenerateLog(ConcatMessage(obj, args));
             UnityEngine.Debug.LogWarning(message);
         }
 
         internal static void LogWarning(object obj, LogColor color, params object[] args)
         {
-            if (!cfg.EnableLog) return;
+            if (!cfg.EnableLog || cfg.LogLevel > LogLevel.Warning) return;
             var message = GenerateLog(ConcatMessage(obj, args), color);
             UnityEngine.Debug.LogWarning(LogColoring(message, color));
         }
@@ -91,27 +99,27 @@ namespace MonsterLogger.Runtime
         #region LogError
         internal static void LogError(object obj)
         {
-            if (!cfg.EnableLog) return;
+            if (!cfg.EnableLog || cfg.LogLevel > LogLevel.Error) return;
             UnityEngine.Debug.LogError(GenerateLog(obj?.ToString()));
         }
 
         internal static void LogError(object obj, LogColor color)
         {
-            if (!cfg.EnableLog) return;
+            if (!cfg.EnableLog || cfg.LogLevel > LogLevel.Error) return;
             var content = GenerateLog(obj?.ToString(), color);
             UnityEngine.Debug.LogError(LogColoring(content, color));
         }
 
         internal static void LogError(object obj, params object[] args)
         {
-            if (!cfg.EnableLog) return;
+            if (!cfg.EnableLog || cfg.LogLevel > LogLevel.Error) return;
             var message = GenerateLog(ConcatMessage(obj, args));
             UnityEngine.Debug.LogError(message);
         }
 
         internal static void LogError(object obj, LogColor color, params object[] args)
         {
-            if (!cfg.EnableLog) return;
+            if (!cfg.EnableLog || cfg.LogLevel > LogLevel.Error) return;
             var message = GenerateLog(ConcatMessage(obj, args), color);
             UnityEngine.Debug.LogError(LogColoring(message, color));
         }
