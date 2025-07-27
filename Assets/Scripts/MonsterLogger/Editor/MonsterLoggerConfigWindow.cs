@@ -10,9 +10,11 @@ namespace MonsterLogger.Editor
         private LogLevel _logLevel = LogLevel.Info;
         private string _logPath = "Logs";
         private bool _writeToFile;
+        private bool _eliminateConditional;
 
         private Vector2 _scrollPosition;
         private const string PrefsPrefix = "MonsterLogger_";
+        private const string CompileCondition = "MST_USE_LOG";
 
         [MenuItem("Tools/Monster Logger/Settings")]
         private static void ShowWindow()
@@ -52,6 +54,15 @@ namespace MonsterLogger.Editor
 
             EditorGUILayout.EndVertical();
 
+            EditorGUILayout.Space(10);
+
+            // 编译设置
+            EditorGUILayout.BeginVertical("box");
+            EditorGUILayout.LabelField("Building Settings", EditorStyles.boldLabel);
+            _eliminateConditional = EditorGUILayout.Toggle("Eliminate Conditional", _eliminateConditional);
+
+            EditorGUILayout.EndVertical();
+
             EditorGUILayout.Space(20);
 
             // 按钮区域
@@ -79,6 +90,7 @@ namespace MonsterLogger.Editor
             _logLevel = (LogLevel)EditorPrefs.GetInt(PrefsPrefix + "LogLevel", (int)LogLevel.Info);
             _logPath = EditorPrefs.GetString(PrefsPrefix + "LogPath", "Logs");
             _writeToFile = EditorPrefs.GetBool(PrefsPrefix + "WriteToFile", false);
+            _eliminateConditional = !ScriptingDefineSymbols.AnyScriptingDefineSymbol(CompileCondition);
         }
 
         private void SavePrefs()
@@ -87,6 +99,12 @@ namespace MonsterLogger.Editor
             EditorPrefs.SetInt(PrefsPrefix + "LogLevel", (int)_logLevel);
             EditorPrefs.SetString(PrefsPrefix + "LogPath", _logPath);
             EditorPrefs.SetBool(PrefsPrefix + "WriteToFile", _writeToFile);
+
+            if (_eliminateConditional && ScriptingDefineSymbols.AnyScriptingDefineSymbol(CompileCondition))
+                ScriptingDefineSymbols.RemoveScriptingDefineSymbol(CompileCondition);
+            else if (!_eliminateConditional &&
+                     !ScriptingDefineSymbols.AnyScriptingDefineSymbol(CompileCondition))
+                ScriptingDefineSymbols.AddScriptingDefineSymbol(CompileCondition);
         }
 
         private void ResetPrefs()
@@ -95,6 +113,10 @@ namespace MonsterLogger.Editor
             _logLevel = LogLevel.Info;
             _logPath = "Logs";
             _writeToFile = false;
+            if (!ScriptingDefineSymbols.AnyScriptingDefineSymbol(CompileCondition))
+                ScriptingDefineSymbols.AddScriptingDefineSymbol(CompileCondition);
+            _eliminateConditional = !ScriptingDefineSymbols.AnyScriptingDefineSymbol(CompileCondition);
+
             SavePrefs();
         }
     }
