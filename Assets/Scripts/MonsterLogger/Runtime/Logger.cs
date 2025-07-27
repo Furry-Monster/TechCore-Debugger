@@ -1,18 +1,22 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Text;
 using System.Threading;
 using UnityEditor;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
+using Object = UnityEngine.Object;
 
 namespace MonsterLogger.Runtime
 {
-    internal class Logger
+    internal static class Logger
     {
-        public static LogConfig cfg;
+        private static LogConfig _cfg;
 
+        [Conditional("MST_USE_LOG")]
         internal static void Initialize(LogConfig config = null)
         {
-            cfg = config ?? new LogConfig()
+            _cfg = config ?? new LogConfig
             {
                 LogFilePath = Application.persistentDataPath + "/",
                 LogFileName = Application.productName + DateTime.Now.ToString("yyyy-MM-dd-HH-mm") + ".log",
@@ -27,112 +31,131 @@ namespace MonsterLogger.Runtime
 
 
             // 启用文件日志记录
-            if (cfg.EnableFileLogger)
+            if (_cfg.EnableFileLogger)
             {
                 var go = new GameObject("FileLogger");
                 if (go == null)
-                    throw new Exception("Failed to create GameObject for FileLogger. Ensure you are running in a Unity environment.");
+                    throw new Exception(
+                        "Failed to create GameObject for FileLogger. Ensure you are running in a Unity environment.");
                 var comp = go.AddComponent<FileLogger>();
-                GameObject.DontDestroyOnLoad(go);
-                comp.Initialize(cfg.LogFilePath, cfg.LogFileName, cfg.LogLevel);
+                Object.DontDestroyOnLoad(go);
+                comp.Initialize(_cfg.LogFilePath, _cfg.LogFileName, _cfg.LogLevel);
             }
         }
 
         #region Log
+
+        [Conditional("MST_USE_LOG")]
         internal static void Log(object obj)
         {
-            if (!cfg.EnableLog || cfg.LogLevel > LogLevel.Info) return;
-            UnityEngine.Debug.Log(GenerateLog(obj?.ToString()));
+            if (!_cfg.EnableLog || _cfg.LogLevel > LogLevel.Info) return;
+            Debug.Log(GenerateLog(obj?.ToString()));
         }
 
+        [Conditional("MST_USE_LOG")]
         internal static void Log(object obj, LogColor color)
         {
-            if (!cfg.EnableLog || cfg.LogLevel > LogLevel.Info) return;
+            if (!_cfg.EnableLog || _cfg.LogLevel > LogLevel.Info) return;
             var content = GenerateLog(obj?.ToString(), color);
-            UnityEngine.Debug.Log(LogColoring(content, color));
+            Debug.Log(LogColoring(content, color));
         }
 
+        [Conditional("MST_USE_LOG")]
         internal static void Log(object obj, params object[] args)
         {
-            if (!cfg.EnableLog || cfg.LogLevel > LogLevel.Info) return;
+            if (!_cfg.EnableLog || _cfg.LogLevel > LogLevel.Info) return;
             var message = GenerateLog(ConcatMessage(obj, args));
-            UnityEngine.Debug.Log(message);
+            Debug.Log(message);
         }
 
+        [Conditional("MST_USE_LOG")]
         internal static void Log(object obj, LogColor color, params object[] args)
         {
-            if (!cfg.EnableLog || cfg.LogLevel > LogLevel.Info) return;
+            if (!_cfg.EnableLog || _cfg.LogLevel > LogLevel.Info) return;
             var message = GenerateLog(ConcatMessage(obj, args), color);
-            UnityEngine.Debug.Log(LogColoring(message, color));
+            Debug.Log(LogColoring(message, color));
         }
+
         #endregion
 
         #region LogWarning
+
+        [Conditional("MST_USE_LOG")]
         internal static void LogWarning(object obj)
         {
-            if (!cfg.EnableLog || cfg.LogLevel > LogLevel.Warning) return;
-            UnityEngine.Debug.LogWarning(GenerateLog(obj?.ToString()));
+            if (!_cfg.EnableLog || _cfg.LogLevel > LogLevel.Warning) return;
+            Debug.LogWarning(GenerateLog(obj?.ToString()));
         }
 
+        [Conditional("MST_USE_LOG")]
         internal static void LogWarning(object obj, LogColor color)
         {
-            if (!cfg.EnableLog || cfg.LogLevel > LogLevel.Warning) return;
+            if (!_cfg.EnableLog || _cfg.LogLevel > LogLevel.Warning) return;
             var content = GenerateLog(obj?.ToString(), color);
-            UnityEngine.Debug.LogWarning(LogColoring(content, color));
+            Debug.LogWarning(LogColoring(content, color));
         }
 
+        [Conditional("MST_USE_LOG")]
         internal static void LogWarning(object obj, params object[] args)
         {
-            if (!cfg.EnableLog || cfg.LogLevel > LogLevel.Warning) return;
+            if (!_cfg.EnableLog || _cfg.LogLevel > LogLevel.Warning) return;
             var message = GenerateLog(ConcatMessage(obj, args));
-            UnityEngine.Debug.LogWarning(message);
+            Debug.LogWarning(message);
         }
 
+        [Conditional("MST_USE_LOG")]
         internal static void LogWarning(object obj, LogColor color, params object[] args)
         {
-            if (!cfg.EnableLog || cfg.LogLevel > LogLevel.Warning) return;
+            if (!_cfg.EnableLog || _cfg.LogLevel > LogLevel.Warning) return;
             var message = GenerateLog(ConcatMessage(obj, args), color);
-            UnityEngine.Debug.LogWarning(LogColoring(message, color));
+            Debug.LogWarning(LogColoring(message, color));
         }
+
         #endregion
 
         #region LogError
+
+        [Conditional("MST_USE_LOG")]
         internal static void LogError(object obj)
         {
-            if (!cfg.EnableLog || cfg.LogLevel > LogLevel.Error) return;
-            UnityEngine.Debug.LogError(GenerateLog(obj?.ToString()));
+            if (!_cfg.EnableLog || _cfg.LogLevel > LogLevel.Error) return;
+            Debug.LogError(GenerateLog(obj?.ToString()));
         }
 
+        [Conditional("MST_USE_LOG")]
         internal static void LogError(object obj, LogColor color)
         {
-            if (!cfg.EnableLog || cfg.LogLevel > LogLevel.Error) return;
+            if (!_cfg.EnableLog || _cfg.LogLevel > LogLevel.Error) return;
             var content = GenerateLog(obj?.ToString(), color);
-            UnityEngine.Debug.LogError(LogColoring(content, color));
+            Debug.LogError(LogColoring(content, color));
         }
 
+        [Conditional("MST_USE_LOG")]
         internal static void LogError(object obj, params object[] args)
         {
-            if (!cfg.EnableLog || cfg.LogLevel > LogLevel.Error) return;
+            if (!_cfg.EnableLog || _cfg.LogLevel > LogLevel.Error) return;
             var message = GenerateLog(ConcatMessage(obj, args));
-            UnityEngine.Debug.LogError(message);
+            Debug.LogError(message);
         }
 
+        [Conditional("MST_USE_LOG")]
         internal static void LogError(object obj, LogColor color, params object[] args)
         {
-            if (!cfg.EnableLog || cfg.LogLevel > LogLevel.Error) return;
+            if (!_cfg.EnableLog || _cfg.LogLevel > LogLevel.Error) return;
             var message = GenerateLog(ConcatMessage(obj, args), color);
-            UnityEngine.Debug.LogError(LogColoring(message, color));
+            Debug.LogError(LogColoring(message, color));
         }
+
         #endregion
 
         private static string GenerateLog(string message, LogColor color = LogColor.Default)
         {
-            var sb = new StringBuilder(cfg.Prefix, 100);
-            if (cfg.ShowTimeStamp)
-                sb.AppendFormat(" [{0}]", DateTime.Now.ToString("HH:mm:ss-fff"));
-            if (cfg.ShowThreadId)
+            var sb = new StringBuilder(_cfg.Prefix, 100);
+            if (_cfg.ShowTimeStamp)
+                sb.AppendFormat(" [{0:HH:mm:ss-fff}]", DateTime.Now);
+            if (_cfg.ShowThreadId)
                 sb.AppendFormat(" [Thread:{0}]", Thread.CurrentThread.ManagedThreadId);
-            if (cfg.ShowColorName)
+            if (_cfg.ShowColorName)
                 sb.AppendFormat(" [{0}]", color);
             sb.AppendFormat(" {0}", message);
             return sb.ToString();
@@ -171,6 +194,7 @@ namespace MonsterLogger.Runtime
                     sb.Append(arg);
                 }
             }
+
             return sb.ToString();
         }
     }

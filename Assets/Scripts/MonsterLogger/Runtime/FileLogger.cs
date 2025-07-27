@@ -1,119 +1,132 @@
-using MonsterLogger.Runtime;
 using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using UnityEngine;
 
-public class LogData
+namespace MonsterLogger.Runtime
 {
-    public string log { get; set; }
-    public string trace { get; set; }
-    public LogType type { get; set; }
-}
-
-public class FileLogger : MonoBehaviour
-{
-    private StreamWriter _streamWriter;
-
-    private readonly ConcurrentQueue<LogData> _concurrentQueue = new ConcurrentQueue<LogData>();
-
-    private readonly ManualResetEvent _manualResetEvent = new ManualResetEvent(false);
-
-    private bool _listening = false;
-
-    private LogLevel _logLevel = LogLevel.Info;
-
-    private string _nowTime => DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-
-    internal void Initialize(string logDirName, string logFileName, LogLevel level)
+    public class LogData
     {
-        string logFilePath = Path.Combine(logDirName, logFileName);
-        _streamWriter = new StreamWriter(logFilePath);
-        // ¼àÌıUnityÈÕÖ¾ÊÂ¼ş
-        Application.logMessageReceivedThreaded += OnLogMessageReceived;
-        // ¼¤»î¼àÌıÏß³Ì
-        _listening = true;
-        Thread fileThread = new Thread(LogToFile);
-        fileThread.Start();
+        public string Log { get; set; }
+        public string Trace { get; set; }
+        public LogType Type { get; set; }
     }
 
-    /// <summary>
-    /// ÈÕÖ¾¼àÌıÏß³Ì
-    /// </summary>
-    private void LogToFile()
+    public class FileLogger : MonoBehaviour
     {
-        while (_listening)
+        private StreamWriter _streamWriter;
+
+        private readonly ConcurrentQueue<LogData> _concurrentQueue = new ConcurrentQueue<LogData>();
+
+        private readonly ManualResetEvent _manualResetEvent = new ManualResetEvent(false);
+
+        private bool _initialized = false;
+
+        private bool _listening;
+
+        private LogLevel _logLevel = LogLevel.Info;
+
+        private static string NowTime => DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+        [Conditional("MST_USE_LOG")]
+        internal void Initialize(string logDirName, string logFileName, LogLevel level)
         {
-            // µÈ´ıĞÅºÅÁ¿£¬Ö±µ½ÓĞÈÕÖ¾Êı¾İ¿É´¦Àí
-            _manualResetEvent.WaitOne();
-            if (_streamWriter == null)
-                throw new Exception("StreamWriter is null. Ensure that FileLogger is initialized properly before logging.");
-            while (_concurrentQueue.Count > 0 && _concurrentQueue.TryDequeue(out var data))
+            var logFilePath = Path.Combine(logDirName, logFileName);
+            _logLevel = level;
+            _streamWriter = new StreamWriter(logFilePath);
+
+            // ç›‘å¬Unityæ—¥å¿—äº‹ä»¶
+            Application.logMessageReceivedThreaded += OnLogMessageReceived;
+            // æ¿€æ´»ç›‘å¬çº¿ç¨‹
+            _listening = true;
+            var fileThread = new Thread(LogToFile);
+            fileThread.Start();
+
+            _initialized = true;
+        }
+
+        /// <summary>
+        /// æ—¥å¿—ç›‘å¬çº¿ç¨‹
+        /// </summary>
+        private void LogToFile()
+        {
+            while (_listening)
             {
-                if (data.type == LogType.Log)
+                // ç­‰å¾…ä¿¡å·é‡ï¼Œç›´åˆ°æœ‰æ—¥å¿—æ•°æ®å¯å¤„ç†
+                _manualResetEvent.WaitOne();
+                if (_streamWriter == null)
+                    throw new Exception(
+                        "StreamWriter is null. Ensure that FileLogger is initialized properly before logging.");
+                while (_concurrentQueue.Count > 0 && _concurrentQueue.TryDequeue(out var data))
                 {
-                    if (_logLevel > LogLevel.Info)
-                        continue;
+                    if (data.Type == LogType.Log)
+                    {
+                        if (_logLevel > LogLevel.Info)
+                            continue;
 
-                    _streamWriter.Write("Log >>> ");
-                    _streamWriter.WriteLine(data.log);
-                    _streamWriter.WriteLine(data.trace);
+                        _streamWriter.Write("Log >>> ");
+                        _streamWriter.WriteLine(data.Log);
+                        _streamWriter.WriteLine(data.Trace);
+                    }
+                    else if (data.Type == LogType.Warning)
+                    {
+                        if (_logLevel > LogLevel.Warning)
+                            continue;
 
+                        _streamWriter.Write("Warning >>> ");
+                        _streamWriter.WriteLine(data.Log);
+                        _streamWriter.WriteLine(data.Trace);
+                    }
+                    else if (data.Type == LogType.Error)
+                    {
+                        if (_logLevel > LogLevel.Error)
+                            continue;
+
+                        _streamWriter.Write("Error >>> ");
+                        _streamWriter.WriteLine(data.Log);
+                        _streamWriter.WriteLine(data.Trace);
+                    }
+
+                    _streamWriter.Write("\r\n");
                 }
-                else if (data.type == LogType.Warning)
-                {
-                    if (_logLevel > LogLevel.Warning)
-                        continue;
 
-                    _streamWriter.Write("Warning >>> ");
-                    _streamWriter.WriteLine(data.log);
-                    _streamWriter.WriteLine(data.trace);
-                }
-                else if (data.type == LogType.Error)
-                {
-                    if (_logLevel > LogLevel.Error)
-                        continue;
-
-                    _streamWriter.Write("Error >>> ");
-                    _streamWriter.WriteLine(data.log);
-                    _streamWriter.WriteLine(data.trace);
-                }
-                _streamWriter.Write("\r\n");
+                _streamWriter.Flush();
+                // é‡ç½®ä¿¡å·é‡ï¼Œå‡†å¤‡ä¸‹ä¸€æ¬¡ç­‰å¾…
+                _manualResetEvent.Reset();
+                Thread.Sleep(1);
             }
-            _streamWriter.Flush();
-            // ÖØÖÃĞÅºÅÁ¿£¬×¼±¸ÏÂÒ»´ÎµÈ´ı
-            _manualResetEvent.Reset();
-            Thread.Sleep(1);
         }
-    }
 
-    private void OnApplicationQuit()
-    {
-
-        // È¡Ïû¼àÌıUnityÈÕÖ¾ÊÂ¼ş
-        Application.logMessageReceivedThreaded -= OnLogMessageReceived;
-        // »ØÊÕ¼àÌıÏß³Ì
-        _listening = false;
-        _manualResetEvent.Set();
-        if (_streamWriter != null)
+        private void OnApplicationQuit()
         {
-            _streamWriter.Flush();
-            _streamWriter.Close();
-            _streamWriter.Dispose();
-            _streamWriter = null;
+            // å–æ¶ˆç›‘å¬Unityæ—¥å¿—äº‹ä»¶
+            if (_initialized)
+                Application.logMessageReceivedThreaded -= OnLogMessageReceived;
+
+            // å›æ”¶ç›‘å¬çº¿ç¨‹
+            _listening = false;
+            _manualResetEvent.Set();
+            if (_streamWriter != null)
+            {
+                _streamWriter.Flush();
+                _streamWriter.Close();
+                _streamWriter.Dispose();
+                _streamWriter = null;
+            }
         }
-    }
 
-    private void OnLogMessageReceived(string condition, string stacktrace, LogType type)
-    {
-        _concurrentQueue.Enqueue(new LogData
+        private void OnLogMessageReceived(string condition, string stacktrace, LogType type)
         {
-            log = _nowTime + " " + condition,
-            trace = stacktrace,
-            type = type
-        });
-        // ÓĞÈÕÖ¾£¬ÉèÖÃĞÅºÅÁ¿
-        _manualResetEvent.Set();
+            _concurrentQueue.Enqueue(new LogData
+            {
+                Log = NowTime + " " + condition,
+                Trace = stacktrace,
+                Type = type
+            });
+            // æœ‰æ—¥å¿—ï¼Œè®¾ç½®ä¿¡å·é‡
+            _manualResetEvent.Set();
+        }
     }
 }

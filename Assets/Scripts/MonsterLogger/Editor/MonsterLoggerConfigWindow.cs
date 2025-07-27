@@ -4,15 +4,14 @@ using UnityEngine;
 
 namespace MonsterLogger.Editor
 {
-
     public class MonsterLoggerConfigWindow : EditorWindow
     {
-        private bool isLogEnabled;
-        private LogLevel logLevel = LogLevel.Info;
-        private string logPath = "Logs";
-        private bool writeToFile;
+        private bool _isLogEnabled;
+        private LogLevel _logLevel = LogLevel.Info;
+        private string _logPath = "Logs";
+        private bool _writeToFile;
 
-        private Vector2 scrollPosition;
+        private Vector2 _scrollPosition;
         private const string PrefsPrefix = "MonsterLogger_";
 
         [MenuItem("Tools/Monster Logger/Settings")]
@@ -26,46 +25,49 @@ namespace MonsterLogger.Editor
 
         private void OnGUI()
         {
-            scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
+            _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition);
 
             EditorGUILayout.Space(10);
             EditorGUILayout.LabelField("Monster Logger Configuration", EditorStyles.boldLabel);
             EditorGUILayout.Space(10);
 
-            // »ù±¾ÉèÖÃ
+            // åŸºæœ¬è®¾ç½®
             EditorGUILayout.BeginVertical("box");
             EditorGUILayout.LabelField("Basic Settings", EditorStyles.boldLabel);
-            isLogEnabled = EditorGUILayout.Toggle("Enable Logging", isLogEnabled);
-            logLevel = (LogLevel)EditorGUILayout.EnumPopup("Log Level", logLevel);
+            _isLogEnabled = EditorGUILayout.Toggle("Enable Logging", _isLogEnabled);
+            _logLevel = (LogLevel)EditorGUILayout.EnumPopup("Log Level", _logLevel);
             EditorGUILayout.EndVertical();
 
             EditorGUILayout.Space(10);
 
-            // Êä³öÉèÖÃ
+            // è¾“å‡ºè®¾ç½®
             EditorGUILayout.BeginVertical("box");
             EditorGUILayout.LabelField("Output Settings", EditorStyles.boldLabel);
-            writeToFile = EditorGUILayout.Toggle("Write To File", writeToFile);
+            _writeToFile = EditorGUILayout.Toggle("Write To File", _writeToFile);
 
-            using (new EditorGUI.DisabledScope(!writeToFile))
+            using (new EditorGUI.DisabledScope(!_writeToFile))
             {
-                logPath = EditorGUILayout.TextField("Log Path", logPath);
+                _logPath = EditorGUILayout.TextField("Log Path", _logPath);
             }
+
             EditorGUILayout.EndVertical();
 
             EditorGUILayout.Space(20);
 
-            // °´Å¥ÇøÓò
+            // æŒ‰é’®åŒºåŸŸ
             EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button("Save Settings", GUILayout.Height(30)))
             {
                 SavePrefs();
                 ShowNotification(new GUIContent("Settings saved!"));
             }
+
             if (GUILayout.Button("Reset", GUILayout.Height(30)))
             {
                 ResetPrefs();
                 ShowNotification(new GUIContent("Settings reset to default!"));
             }
+
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.EndScrollView();
@@ -73,26 +75,26 @@ namespace MonsterLogger.Editor
 
         private void LoadPrefs()
         {
-            isLogEnabled = EditorPrefs.GetBool(PrefsPrefix + "IsEnabled", true);
-            logLevel = (LogLevel)EditorPrefs.GetInt(PrefsPrefix + "LogLevel", (int)LogLevel.Info);
-            logPath = EditorPrefs.GetString(PrefsPrefix + "LogPath", "Logs");
-            writeToFile = EditorPrefs.GetBool(PrefsPrefix + "WriteToFile", false);
+            _isLogEnabled = EditorPrefs.GetBool(PrefsPrefix + "IsEnabled", true);
+            _logLevel = (LogLevel)EditorPrefs.GetInt(PrefsPrefix + "LogLevel", (int)LogLevel.Info);
+            _logPath = EditorPrefs.GetString(PrefsPrefix + "LogPath", "Logs");
+            _writeToFile = EditorPrefs.GetBool(PrefsPrefix + "WriteToFile", false);
         }
 
         private void SavePrefs()
         {
-            EditorPrefs.SetBool(PrefsPrefix + "IsEnabled", isLogEnabled);
-            EditorPrefs.SetInt(PrefsPrefix + "LogLevel", (int)logLevel);
-            EditorPrefs.SetString(PrefsPrefix + "LogPath", logPath);
-            EditorPrefs.SetBool(PrefsPrefix + "WriteToFile", writeToFile);
+            EditorPrefs.SetBool(PrefsPrefix + "IsEnabled", _isLogEnabled);
+            EditorPrefs.SetInt(PrefsPrefix + "LogLevel", (int)_logLevel);
+            EditorPrefs.SetString(PrefsPrefix + "LogPath", _logPath);
+            EditorPrefs.SetBool(PrefsPrefix + "WriteToFile", _writeToFile);
         }
 
         private void ResetPrefs()
         {
-            isLogEnabled = true;
-            logLevel = LogLevel.Info;
-            logPath = "Logs";
-            writeToFile = false;
+            _isLogEnabled = true;
+            _logLevel = LogLevel.Info;
+            _logPath = "Logs";
+            _writeToFile = false;
             SavePrefs();
         }
     }
