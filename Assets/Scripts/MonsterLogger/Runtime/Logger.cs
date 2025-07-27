@@ -48,32 +48,33 @@ namespace MonsterLogger.Runtime
         [Conditional("MST_USE_LOG")]
         internal static void Log(object obj)
         {
-            if (!_cfg.EnableLog || _cfg.LogLevel > LogLevel.Info) return;
+            if (!_cfg.EnableLog || _cfg.LogLevel > LogLevel.Info)
+                return;
             Debug.Log(GenerateLog(obj?.ToString()));
         }
 
         [Conditional("MST_USE_LOG")]
         internal static void Log(object obj, LogColor color)
         {
-            if (!_cfg.EnableLog || _cfg.LogLevel > LogLevel.Info) return;
-            var content = GenerateLog(obj?.ToString(), color);
-            Debug.Log(LogColoring(content, color));
+            if (!_cfg.EnableLog || _cfg.LogLevel > LogLevel.Info)
+                return;
+            Debug.Log(LogColoring(GenerateLog(obj?.ToString(), color), color));
         }
 
         [Conditional("MST_USE_LOG")]
         internal static void Log(object obj, params object[] args)
         {
-            if (!_cfg.EnableLog || _cfg.LogLevel > LogLevel.Info) return;
-            var message = GenerateLog(ConcatMessage(obj, args));
-            Debug.Log(message);
+            if (!_cfg.EnableLog || _cfg.LogLevel > LogLevel.Info)
+                return;
+            Debug.Log(GenerateLog(ConcatMessage(obj, args)));
         }
 
         [Conditional("MST_USE_LOG")]
         internal static void Log(object obj, LogColor color, params object[] args)
         {
-            if (!_cfg.EnableLog || _cfg.LogLevel > LogLevel.Info) return;
-            var message = GenerateLog(ConcatMessage(obj, args), color);
-            Debug.Log(LogColoring(message, color));
+            if (!_cfg.EnableLog || _cfg.LogLevel > LogLevel.Info)
+                return;
+            Debug.Log(LogColoring(GenerateLog(ConcatMessage(obj, args), color), color));
         }
 
         #endregion
@@ -83,32 +84,33 @@ namespace MonsterLogger.Runtime
         [Conditional("MST_USE_LOG")]
         internal static void LogWarning(object obj)
         {
-            if (!_cfg.EnableLog || _cfg.LogLevel > LogLevel.Warning) return;
+            if (!_cfg.EnableLog || _cfg.LogLevel > LogLevel.Warning)
+                return;
             Debug.LogWarning(GenerateLog(obj?.ToString()));
         }
 
         [Conditional("MST_USE_LOG")]
         internal static void LogWarning(object obj, LogColor color)
         {
-            if (!_cfg.EnableLog || _cfg.LogLevel > LogLevel.Warning) return;
-            var content = GenerateLog(obj?.ToString(), color);
-            Debug.LogWarning(LogColoring(content, color));
+            if (!_cfg.EnableLog || _cfg.LogLevel > LogLevel.Warning)
+                return;
+            Debug.LogWarning(LogColoring(GenerateLog(obj?.ToString(), color), color));
         }
 
         [Conditional("MST_USE_LOG")]
         internal static void LogWarning(object obj, params object[] args)
         {
-            if (!_cfg.EnableLog || _cfg.LogLevel > LogLevel.Warning) return;
-            var message = GenerateLog(ConcatMessage(obj, args));
-            Debug.LogWarning(message);
+            if (!_cfg.EnableLog || _cfg.LogLevel > LogLevel.Warning)
+                return;
+            Debug.LogWarning(GenerateLog(ConcatMessage(obj, args)));
         }
 
         [Conditional("MST_USE_LOG")]
         internal static void LogWarning(object obj, LogColor color, params object[] args)
         {
-            if (!_cfg.EnableLog || _cfg.LogLevel > LogLevel.Warning) return;
-            var message = GenerateLog(ConcatMessage(obj, args), color);
-            Debug.LogWarning(LogColoring(message, color));
+            if (!_cfg.EnableLog || _cfg.LogLevel > LogLevel.Warning)
+                return;
+            Debug.LogWarning(LogColoring(GenerateLog(ConcatMessage(obj, args), color), color));
         }
 
         #endregion
@@ -118,32 +120,33 @@ namespace MonsterLogger.Runtime
         [Conditional("MST_USE_LOG")]
         internal static void LogError(object obj)
         {
-            if (!_cfg.EnableLog || _cfg.LogLevel > LogLevel.Error) return;
+            if (!_cfg.EnableLog || _cfg.LogLevel > LogLevel.Error)
+                return;
             Debug.LogError(GenerateLog(obj?.ToString()));
         }
 
         [Conditional("MST_USE_LOG")]
         internal static void LogError(object obj, LogColor color)
         {
-            if (!_cfg.EnableLog || _cfg.LogLevel > LogLevel.Error) return;
-            var content = GenerateLog(obj?.ToString(), color);
-            Debug.LogError(LogColoring(content, color));
+            if (!_cfg.EnableLog || _cfg.LogLevel > LogLevel.Error)
+                return;
+            Debug.LogError(LogColoring(GenerateLog(obj?.ToString(), color), color));
         }
 
         [Conditional("MST_USE_LOG")]
         internal static void LogError(object obj, params object[] args)
         {
-            if (!_cfg.EnableLog || _cfg.LogLevel > LogLevel.Error) return;
-            var message = GenerateLog(ConcatMessage(obj, args));
-            Debug.LogError(message);
+            if (!_cfg.EnableLog || _cfg.LogLevel > LogLevel.Error)
+                return;
+            Debug.LogError(GenerateLog(ConcatMessage(obj, args)));
         }
 
         [Conditional("MST_USE_LOG")]
         internal static void LogError(object obj, LogColor color, params object[] args)
         {
-            if (!_cfg.EnableLog || _cfg.LogLevel > LogLevel.Error) return;
-            var message = GenerateLog(ConcatMessage(obj, args), color);
-            Debug.LogError(LogColoring(message, color));
+            if (!_cfg.EnableLog || _cfg.LogLevel > LogLevel.Error)
+                return;
+            Debug.LogError(LogColoring(GenerateLog(ConcatMessage(obj, args), color), color));
         }
 
         #endregion
@@ -190,9 +193,7 @@ namespace MonsterLogger.Runtime
             if (args != null)
             {
                 foreach (var arg in args)
-                {
                     sb.Append(arg);
-                }
             }
 
             return sb.ToString();
